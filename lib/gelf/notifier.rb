@@ -26,7 +26,7 @@ module GELF
       self.default_options['level'] ||= GELF::UNKNOWN
       self.default_options['facility'] ||= 'gelf-rb'
 
-      @sender = RubyUdpSender.new([[host, port]])
+      @sender = sender_klass.new([[host, port]])
       self.level_mapping = :logger
     end
 
@@ -238,5 +238,13 @@ module GELF
       end
       hash
     end
+
+    protected
+
+    def sender_klass
+      protocol = default_options.delete(:protocol) || default_options.delete("protocol")
+      protocol.to_s == "tcp" ? RubyTcpSender : RubyUdpSender
+    end
+
   end
 end
