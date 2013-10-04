@@ -34,7 +34,8 @@ module GELF
       socket = @sockets[@i]
       @i = (@i + 1) % @sockets.length
       datagrams.each do |datagram|
-        socket.send datagram, 0
+        # \0 terminates each TCP frame on the connection
+        socket.send "#{datagram}\0", 0
       end
     end
 

@@ -8,11 +8,14 @@ module GELF
 
     attr_accessor :enabled, :collect_file_and_line, :rescue_network_errors
     attr_reader :max_chunk_size, :level, :default_options, :level_mapping
+    attr_reader :config_options
 
     # +host+ and +port+ are host/ip and port of graylog2-server.
     # +max_size+ is passed to max_chunk_size=.
     # +default_options+ is used in notify!
-    def initialize(host = 'localhost', port = 12201, max_size = 'WAN', default_options = {})
+    # +config_options+ can be used to specify the protocol (default udp, tcp
+    # supported)
+    def initialize(host = 'localhost', port = 12201, max_size = 'WAN', default_options = {}, config_options = {})
       @enabled = true
       @collect_file_and_line = true
 
@@ -25,6 +28,8 @@ module GELF
       self.default_options['host'] ||= Socket.gethostname
       self.default_options['level'] ||= GELF::UNKNOWN
       self.default_options['facility'] ||= 'gelf-rb'
+
+      self.config_options = config_options
 
       @sender = sender_klass.new([[host, port]])
       self.level_mapping = :logger
@@ -246,7 +251,7 @@ module GELF
     protected
 
     def sender_klass
-      protocol = default_options.delete(:protocol) || default_options.delete("protocol")
+      protocol = config_options.delete(:protocol) || config_options.delete("protocol")
       protocol.to_s == "tcp" ? RubyTcpSender : RubyUdpSender
     end
 
