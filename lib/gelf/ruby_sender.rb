@@ -16,6 +16,10 @@ module GELF
         @socket.send(datagram, 0, host, port)
       end
     end
+
+    def compress_message?
+      false
+    end
   end
 
   class RubyTcpSender
@@ -37,6 +41,10 @@ module GELF
     def addresses=(new_addresses)
       @addresses = new_addresses
       @sockets = build_sockets
+    end
+
+    def compress_message?
+      false
     end
 
     protected
