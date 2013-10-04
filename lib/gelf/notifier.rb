@@ -82,6 +82,10 @@ module GELF
       @default_options = self.class.stringify_keys(options)
     end
 
+    def config_options=(options)
+      @config_options = self.class.stringify_keys(options)
+    end
+
     # +mapping+ may be a hash, 'logger' (GELF::LOGGER_MAPPING) or 'direct' (GELF::DIRECT_MAPPING).
     # Default (compatible) value is 'logger'.
     def level_mapping=(mapping)
@@ -251,8 +255,7 @@ module GELF
     protected
 
     def sender_klass
-      protocol = config_options.delete(:protocol) || config_options.delete("protocol")
-      protocol.to_s == "tcp" ? RubyTcpSender : RubyUdpSender
+      config_options["protocol"].to_s == "tcp" ? RubyTcpSender : RubyUdpSender
     end
 
   end
